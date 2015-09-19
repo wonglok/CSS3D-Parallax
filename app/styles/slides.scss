@@ -1,0 +1,97 @@
+body{
+	// background-color: red;
+}
+
+$slideNumber: 4;
+
+
+@mixin slide-section{
+	$slide: "slide";
+
+	@for $i from 1 through $slideNumber {
+		// $fx: (($slideNumber/2) * -1 + $i ) ;
+
+		&.slide-#{$i} {
+			background-attachment: fixed;
+			background-image: url('http://lorempixel.com/500/50#{$i}');
+			background-size: cover;
+
+		}
+	}
+}
+
+.slide-section{
+	width: 100vw;
+	height: 80vh;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	@include slide-section;
+
+	&.slide-1{
+		// height: 40vh;
+	}
+
+}
+
+
+//slide object group
+.sog{
+	width: 100%;
+	height: 100%;
+
+	padding: 0px;
+	margin:0px;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-wrap:wrap;
+
+	overflow: hidden;
+	//slide object
+	.so {
+		display: block;
+		list-style: none;
+
+		float:left;
+
+		margin: 30px;
+		width: 100px;
+		height: 100px;
+
+		background-color: papayawhip;
+	}
+}
+
+.section{
+	display: block;
+	width: 100%;
+	height: 40vh;
+	background-color: papayawhip;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+
+	h1 {
+		padding:0;
+		margin:0;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

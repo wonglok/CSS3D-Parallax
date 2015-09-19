@@ -41,6 +41,7 @@ const testLintOptions = {
 };
 
 gulp.task('lint', lint('app/scripts/**/*.js'));
+
 gulp.task('lint:test', lint('test/spec/**/*.js', testLintOptions));
 
 gulp.task('html', ['styles'], () => {
@@ -110,9 +111,14 @@ gulp.task('serve', ['styles', 'fonts'], () => {
     '.tmp/fonts/**/*'
   ]).on('change', reload);
 
+
+  gulp.watch('app/scripts/**/*.js', ['lint']);
+
   gulp.watch('app/styles/**/*.scss', ['styles']);
   gulp.watch('app/fonts/**/*', ['fonts']);
   gulp.watch('bower.json', ['wiredep', 'fonts']);
+
+
 });
 
 gulp.task('serve:dist', () => {
