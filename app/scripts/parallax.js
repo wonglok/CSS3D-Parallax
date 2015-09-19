@@ -113,7 +113,6 @@
 				),
 				ty = (
 						(
-							// 0 *
 							deriveScrollParallax(secIndex) / 4
 							+ sys.screenCenterY / -10
 						)
@@ -269,13 +268,12 @@
 			onResize();
 
 			window.addEventListener('resize', onResize);
+			window.addEventListener('scroll', onScroll);
 
 			if (!Modernizr.touch){
-				window.addEventListener('scroll', onScroll);
 				window.addEventListener('mousemove', onMouseMove);
 			}else{
 				mobileScroll.init();
-				window.addEventListener('scroll', onScroll);
 			}
 
 

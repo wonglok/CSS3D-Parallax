@@ -5,21 +5,59 @@ body{
 $slideNumber: 4;
 
 
-@mixin slide-section{
+@mixin slide-background{
 	$slide: "slide";
-
 	@for $i from 1 through $slideNumber {
-		// $fx: (($slideNumber/2) * -1 + $i ) ;
-
 		&.#{$slide}-#{$i} {
 			background-attachment: fixed;
 			background-color: #5D5656;
-			// background-image: surl('http://lorempixel.com/500/50#{$i}');
+			background-image: url('../images/obj-bg/#{$i}.jpg');
 			background-size: cover;
-
 		}
 	}
 }
+
+
+
+
+.section{
+	display: block;
+	width: 100%;
+	height: 40vh;
+	background-color: papayawhip;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	&.header{
+		height: 60vh;
+		background: url('../images/obj-bg/14.jpg');
+		color:white;
+	}
+	&.intro-1{
+		background: url('../images/obj-bg/12.jpg');
+		color:white;
+	}
+	&.intro-2{
+		background: url('../images/obj-bg/11.jpg');
+		color:white;
+	}
+	&.intro-3{
+		background: url('../images/obj-bg/2.jpg');
+		// color:white;
+	}
+	&.footer{
+		background: url('../images/obj-bg/13.jpg');
+		color:white;
+	}
+
+	h1 {
+		padding:0;
+		margin:0;
+	}
+}
+
 
 .slide-section{
 	width: 100vw;
@@ -29,7 +67,7 @@ $slideNumber: 4;
 	justify-content: center;
 	align-items: center;
 
-	@include slide-section;
+	@include slide-background;
 
 	&.slide-1{
 		height: 70vh;
@@ -71,32 +109,12 @@ $slideNumber: 4;
 		float:left;
 
 		margin: 30px;
-		width: 100px;
-		height: 100px;
-
-		background-color: papayawhip;
+		width: 15vh;
+		height: 15vh;
 	}
+
 }
 
-.section{
-	display: block;
-	width: 100%;
-	height: 40vh;
-	background-color: papayawhip;
-
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
-	&.header{
-		height: 60vh;
-	}
-
-	h1 {
-		padding:0;
-		margin:0;
-	}
-}
 
 
 
