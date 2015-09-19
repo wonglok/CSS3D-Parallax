@@ -9,10 +9,11 @@ $slideNumber: 4;
 	$slide: "slide";
 	@for $i from 1 through $slideNumber {
 		&.#{$slide}-#{$i} {
+			background-repeat: no-repeat;
 			background-attachment: fixed;
+			background-size: cover;
 			background-color: #5D5656;
 			background-image: url('../images/obj-bg/#{$i}.jpg');
-			background-size: cover;
 		}
 	}
 }
@@ -33,22 +34,27 @@ $slideNumber: 4;
 	&.header{
 		height: 60vh;
 		background: url('../images/obj-bg/14.jpg');
+		background-size: cover;
 		color:white;
 	}
 	&.intro-1{
 		background: url('../images/obj-bg/12.jpg');
+		background-size: cover;
 		color:white;
 	}
 	&.intro-2{
 		background: url('../images/obj-bg/11.jpg');
+		background-size: cover;
 		color:white;
 	}
 	&.intro-3{
 		background: url('../images/obj-bg/2.jpg');
+		background-size: cover;
 		// color:white;
 	}
 	&.footer{
 		background: url('../images/obj-bg/13.jpg');
+		background-size: cover;
 		color:white;
 	}
 
