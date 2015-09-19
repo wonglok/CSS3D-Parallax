@@ -16,9 +16,10 @@
 		currentPageIndex: 0,
 
 		sections: [],
-		sectionClass: '.section',
+		slideSectionClass: '.slide-section',
 
-		last: {}
+		orX: 0,
+		orY: 0
 
 	});
 	core.val('val.lastSys', {
@@ -109,7 +110,7 @@
 			section.items.forEach(function(movObj){
 				var tx = (
 					sys.screenCenterX / -10
-					* movObj.factor / 4
+					* movObj.factor / 3
 				),
 				ty = (
 						(
@@ -127,16 +128,14 @@
 		function renderMobile(section, secIndex){
 			section.items.forEach(function(movObj){
 				var tx = (
-					0
+					// 0
 					// sys.screenCenterX / -10
 					// * movObj.factor / 4
+					sys.orX
 				),
 				ty = (
-						(
-							// 0 *
-							deriveScrollParallax(secIndex) / 4
-							// + sys.screenCenterY / -10
-						)
+						sys.orY
+						+ deriveScrollParallax(secIndex) / 4
 						* movObj.factor / 10
 					),
 				tz = 0;
@@ -146,12 +145,10 @@
 		}
 
 		function adaptRender(section, secIndex){
-			if (section.isSlide === true){
-				if(!Modernizr.touch){
-					renderDesktop(section, secIndex);
-				}else{
-					renderMobile(section, secIndex);
-				}
+			if(!Modernizr.touch){
+				renderDesktop(section, secIndex);
+			}else{
+				renderMobile(section, secIndex);
 			}
 		}
 
@@ -191,11 +188,12 @@
 		var loop = core.get('mod.loop');
 		var sys = core.get('val.sys');
 		var mobileScroll = core.get('mod.mobileScroll');
+		var deviceOrient = core.get('mod.deviceOrient');
 
 		function getSlideInfo(){
 			sys.sections = [];
 
-			$('.slide-section').each(function (){
+			$(sys.slideSectionClass).each(function (){
 				var slideItems = [];
 
 				$(this).find('.so').each(function(){
@@ -274,6 +272,7 @@
 				window.addEventListener('mousemove', onMouseMove);
 			}else{
 				mobileScroll.init();
+				deviceOrient.init();
 			}
 
 
@@ -282,34 +281,38 @@
 		return api;
 	});
 
+
 	core.set('mod.mobileScroll', function(){
 		var api = {};
 		var sys = core.get('val.sys');
 
+		var lastCX,
+			lastCY;
 
 		function onTouchStart(evt){
-			sys.last.cX = evt.touches[0].clientX;
-			sys.last.cY = evt.touches[0].clientY;
+			lastCX = evt.touches[0].clientX;
+			lastCY = evt.touches[0].clientY;
 		}
+
 		function onTouchMove(evt){
 			evt.preventDefault();
 
 			var nowX = evt.touches[0].clientX,
 				nowY = evt.touches[0].clientY;
 
-			var sX = sys.last.cX - nowX,
-				sY = sys.last.cY - nowY;
+			var sX = lastCX - nowX,
+				sY = lastCY - nowY;
 
-			window.scrollTo(
-				sX + window.scrollX,
-				sY + window.scrollY
-			);
+			var newX = sX + window.scrollX;
+			var newY = sY + window.scrollY;
 
-			sys.scrollX = window.scrollX;
-			sys.scrollY = window.scrollY;
+			window.scrollTo(newX, newY);
 
-			sys.last.cX = nowX;
-			sys.last.cY = nowY;
+			sys.scrollX = newX;
+			sys.scrollY = newY;
+
+			lastCX = nowX;
+			lastCY = nowY;
 		}
 
 		function init(){
@@ -319,6 +322,44 @@
 
 		api.init = init;
 
+
+		return api;
+	});
+
+	//https://developer.mozilla.org/en-US/docs/Web/API/Detecting_device_orientation#Browser_compatibility
+	core.set('mod.deviceOrient', function(){
+		var api = {};
+		var sys = core.get('val.sys');
+		var loop = core.get('mod.loop');
+
+		function handleOrient(event) {
+			var x = event.beta;  // In degree in the range [-180,180]
+			var y = event.gamma; // In degree in the range [-90,90]
+
+			// Because we don't want to have the device upside down
+			// We constrain the x value to the range [-90,90]
+			if (x > 90) {
+				x = 90;
+			}
+			if (x < -90) {
+				x = -90;
+			}
+
+			sys.orX = y;
+			sys.orY = x - 45; //defailt tilt of hand hold
+
+			// console.log(y,x);
+			loop.start();
+
+		}
+		function init(){
+			var iOS = /iPad|iPhone|iPod/.test(navigator.platform);
+			if (iOS){
+				window.addEventListener('deviceorientation', handleOrient);
+			}
+		}
+
+		api.init = init;
 
 		return api;
 	});

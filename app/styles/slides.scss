@@ -48,9 +48,9 @@ $slideNumber: 4;
 		color:white;
 	}
 	&.intro-3{
-		background: url('../images/obj-bg/2.jpg');
+		background: url('../images/obj-bg/23.jpg');
 		background-size: cover;
-		// color:white;
+		color:white;
 	}
 	&.footer{
 		background: url('../images/obj-bg/13.jpg');
@@ -105,17 +105,13 @@ $slideNumber: 4;
 	justify-content: center;
 	align-items: center;
 	flex-wrap:wrap;
-
 	overflow: hidden;
-	//slide object
 	.so {
-		display: block;
-		list-style: none;
 
-		float:left;
+		display: block;
 
 		margin: 30px;
-		width: 15vh;
+		// width: 15vh;
 		height: 15vh;
 	}
 
