@@ -1,9 +1,9 @@
-(function(core, $){
+(function(core, $, Modernizr){
 	'use strict';
 
 	core.val('val.sys', {
 		//slide vh
-		slideVh: 0.8,
+		slideVh: 0.75,
 
 		winHeight: 0,
 		winWidth: 0,
@@ -13,7 +13,9 @@
 		screenCenterY: 0,
 		scrollY: 0,
 		currentPageIndex: 0,
-		headerHeight: 0
+
+		sections: [],
+		sectionClass: '.section'
 
 	});
 	core.val('val.lastSys', {
@@ -79,8 +81,6 @@
 		api.stop = stopLoop;
 		api.start = startLoop;
 
-
-
 		return api;
 	});
 
@@ -88,46 +88,61 @@
 		var api = {};
 		var sys = core.get('val.sys');
 
-		var $slideObjectGroups = $('.sog');
 
-		function deriveScrollParallax(sectionIndex){
-			var slideScreenGap = ( sys.winHeight - ( sys.winHeight * sys.slideVh ) ) / 2;
-			var slideCenterScrollY = sys.scrollY - sys.headerHeight - (sectionIndex * sys.winHeight * sys.slideVh) + slideScreenGap;
+		function getSlideOffset(secIndex){
+			return sys.sections[secIndex].offset;
+		}
+
+		function getSlideHeight(secIndex){
+			return sys.sections[secIndex].height;
+		}
+
+		function deriveScrollParallax(secIndex){
+			var slideScreenGap = Math.abs( sys.winHeight - getSlideHeight(secIndex) ) / 2;
+			var slideCenterScrollY = sys.scrollY - getSlideOffset(secIndex) + slideScreenGap;
 			return slideCenterScrollY;
 		}
 
-		function renderDesktop(sectionIndex){
-			// console.log(sectionIndex);
-			$(this).find('.so').each(function(){
-				var tx = (sys.screenCenterX / -10),
+		function renderDesktop(section, secIndex){
+				section.items.forEach(function(movObj){
+					var tx = (
+						sys.screenCenterX / -10
+						* movObj.friction / 4
+					),
 					ty = (
-							deriveScrollParallax(sectionIndex) / 3
+							// 0 *
+							deriveScrollParallax(secIndex) / 4
 							+ sys.screenCenterY / -10
 						),
 					tz = 0;
 
-				$(this).css( 'transform', 'translate3d(' + tx + 'px,' + ty + 'px,' + tz + 'px)' );
-			});
+					$(movObj.el).css( 'transform', 'translate3d(' + tx + 'px,' + ty + 'px,' + tz + 'px)' );
+				});
 		}
 
-		var loopVisibleObject = function(){
-			var sectionIndex = 0;
-
-			$slideObjectGroups.each(function(){
-				if (
-					sys.currentPageIndex === sectionIndex
-					|| sys.currentPageIndex === sectionIndex + 1
-					|| sys.currentPageIndex === sectionIndex - 1
-				){
-					renderDesktop.apply(this, [sectionIndex]);
+		function adaptRender(section, secIndex){
+			if (section.isSlide === true){
+				if(!Modernizr.touch){
+					renderDesktop(section, secIndex);
 				}
-				sectionIndex++;
-			});
-		};
+			}
+		}
 
-		api.render = function(){
-			loopVisibleObject();
-		};
+		function loopThroughEachSlide(section, secIndex){
+				if (
+					sys.currentPageIndex === secIndex
+					|| sys.currentPageIndex === secIndex + 1
+					|| sys.currentPageIndex === secIndex - 1
+				){
+					adaptRender(section, secIndex);
+				}
+		}
+
+		function render(){
+			sys.sections.forEach(loopThroughEachSlide);
+		}
+
+		api.render = render;
 
 		return api;
 	});
@@ -149,24 +164,48 @@
 		var loop = core.get('mod.loop');
 		var sys = core.get('val.sys');
 
-		// var throttle = core.get('fn.throttle');
-		// var slowLog = throttle(function(){
-		// 	console.table([sys]);
-		// }, 100);
+		function getSlideInfo(){
+			sys.sections = [];
+
+			$('.slide-section').each(function (){
+				var slideItems = [];
+
+				$(this).find('.so').each(function(){
+					slideItems.push({
+						el: $(this)[0],
+						friction: $(this).attr('friction')
+					});
+				});
+
+				sys.sections.push({
+					isSlide: true,
+					height: $(this).height(),
+					offset: $(this).offset().top,
+					items: slideItems
+				});
+
+			});
+
+			// console.table(sys.sections);
+		}
 
 		//Calculation
 		function deriveScreenCenter(){
 			sys.screenCenterX = (sys.winWidth / 2) - sys.clientX;
 			sys.screenCenterY = (sys.winHeight / 2) - sys.clientY;
 		}
-		function deriveHeaderHeight(){
-			sys.headerHeight = $('.section.header').height();
-		}
 
+		function deriveCurrentPage(){
+			var sections = sys.sections;
+			sys.currentPageIndex = 0;
 
-		function derivePageIndex(){
-			var currentPageScrollRatio = (sys.scrollY - sys.headerHeight) / (sys.winHeight * sys.slideVh);
-			sys.currentPageIndex = Math.round( currentPageScrollRatio );
+			for (var secIndex = sections.length - 1; secIndex >= 0; secIndex--) {
+				if (sys.scrollY >= sections[secIndex].offset){
+					sys.currentPageIndex = secIndex;
+					break;
+				}
+			}
+			// console.log(sys.currentPageIndex);
 		}
 
 		//event handler
@@ -175,9 +214,10 @@
 			sys.winWidth = document.documentElement.clientWidth;
 
 			deriveScreenCenter();
-		
+
 			loop.start();
 		}
+
 		function onMouseMove(event){
 			sys.clientX = event.clientX;
 			sys.clientY = event.clientY;
@@ -187,20 +227,40 @@
 		}
 		function onScroll(){
 			sys.scrollY = window.scrollY;
-			derivePageIndex();
+			deriveCurrentPage();
 
 			loop.start();
 		}
 
+		function onTouchStart(){
+
+		}
+		function onTouchMove(){
+
+		}
+		function onTouchCancel(){
+
+		}
+		function onTouchEnd(){
+
+		}
 
 		api.init = function(){
+			getSlideInfo();
 			onResize();
 
-			deriveHeaderHeight();
-
 			window.addEventListener('resize', onResize);
-			window.addEventListener('scroll', onScroll);
-			window.addEventListener('mousemove', onMouseMove);
+
+			if (!Modernizr.touch){
+				window.addEventListener('scroll', onScroll);
+				window.addEventListener('mousemove', onMouseMove);
+			}else{
+				window.addEventListener('touchstart', onTouchStart);
+				window.addEventListener('touchmove', onTouchMove);
+
+				window.addEventListener('touchcancel', onTouchCancel);
+				window.addEventListener('touchend', onTouchEnd);
+			}
 
 		};
 
@@ -208,6 +268,6 @@
 	});
 
 
-}(window.core, window.$));
+}(window.core, window.$, window.Modernizr));
 
 

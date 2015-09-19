@@ -11,9 +11,10 @@ $slideNumber: 4;
 	@for $i from 1 through $slideNumber {
 		// $fx: (($slideNumber/2) * -1 + $i ) ;
 
-		&.slide-#{$i} {
+		&.#{$slide}-#{$i} {
 			background-attachment: fixed;
-			background-image: url('http://lorempixel.com/500/50#{$i}');
+			background-color: #5D5656;
+			// background-image: surl('http://lorempixel.com/500/50#{$i}');
 			background-size: cover;
 
 		}
@@ -31,7 +32,18 @@ $slideNumber: 4;
 	@include slide-section;
 
 	&.slide-1{
-		// height: 40vh;
+		height: 70vh;
+	}
+
+	&.slide-2{
+		height: 55vh;
+	}
+
+	&.slide-3{
+		height: 75vh;
+	}
+	&.slide-4{
+		height: 80vh;
 	}
 
 }
@@ -76,6 +88,9 @@ $slideNumber: 4;
 	justify-content: center;
 	align-items: center;
 
+	&.header{
+		height: 45vh;
+	}
 
 	h1 {
 		padding:0;
