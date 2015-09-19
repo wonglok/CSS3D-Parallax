@@ -288,7 +288,6 @@
 		var api = {};
 		var sys = core.get('val.sys');
 
-		sys.last = sys.last || {};
 
 		function onTouchStart(evt){
 			sys.last.cX = evt.touches[0].clientX;
@@ -315,17 +314,11 @@
 			sys.last.cY = nowY;
 		}
 
-		// function onTouchCancel(){
-		// }
-		// function onTouchEnd(){
-		// }
-
 		function init(){
 			document.addEventListener('touchstart', onTouchStart);
 			document.addEventListener('touchmove', onTouchMove);
-			// document.addEventListener('touchcancel', onTouchCancel);
-			// document.addEventListener('touchend', onTouchEnd);
 		}
+
 		api.init = init;
 
 
