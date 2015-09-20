@@ -9,8 +9,8 @@
 
 		clientX: 0,
 		clientY: 0,
-		screenCenterX: 0,
-		screenCenterY: 0,
+		centerX: 0,
+		centerY: 0,
 
 		scrollY: 0,
 		currentPageIndex: 0,
@@ -18,8 +18,8 @@
 		sections: [],
 		slideSectionClass: '.slide-section',
 
-		orX: 0,
-		orY: 0
+		orientX: 0,//orient
+		orientY: 0
 
 	});
 	core.val('val.lastSys', {
@@ -106,41 +106,87 @@
 			return slideCenterScrollY;
 		}
 
+		function render2D(movObj, tx, ty, tz){
+			$(movObj.el).css( 'transform', 'translate3d(' + tx + 'px,' + ty + 'px,' + tz + 'px)' );
+		}
+		function render3D(movObj, tx, ty){
+			//limit left right rotation.
+			if (tx <= -70){
+				tx = -70;
+			}
+			if (tx >= 70){
+				tx = 70;
+			}
+
+			//limit top down rotation
+			if (ty <= -70){
+				ty = -70;
+			}
+			if (ty >= 70){
+				ty = 70;
+			}
+
+			//rotateY axis to feel left right
+			//rotateX axis to feel top down
+			$(movObj.el).css( 'transform', 'rotateY(' + ( tx ) + 'deg) ' + 'rotateX(' + ( ty * -0.9 ) + 'deg)' );
+		}
+
+
+
 		function renderDesktop(section, secIndex){
-			section.items.forEach(function(movObj){
+			section.items.forEach(function (movObj){
 				var tx = (
-					sys.screenCenterX / -10
+					sys.centerX / -10
 					* movObj.factor / 3
-				),
-				ty = (
+				);
+				var ty = (
 						(
 							deriveScrollParallax(secIndex) / 4
-							+ sys.screenCenterY / -10
+							+ sys.centerY / -10
 						)
 						* movObj.factor / 10
-					),
-				tz = 0;
+					);
+				var tz = 0;
 
-				$(movObj.el).css( 'transform', 'translate3d(' + tx + 'px,' + ty + 'px,' + tz + 'px)' );
+				if (section.vOnly === 'true'){
+					tx = 0;
+					ty = (
+							deriveScrollParallax(secIndex) / 4
+							* movObj.factor / 10
+						);
+				}
+				if(section.threed === 'true'){
+					render3D(movObj, tx, ty, tz);
+				}else{
+					render2D(movObj, tx, ty, tz);
+				}
 			});
+
 		}
 
 		function renderMobile(section, secIndex){
-			section.items.forEach(function(movObj){
-				var tx = (
-					// 0
-					// sys.screenCenterX / -10
-					// * movObj.factor / 4
-					sys.orX
-				),
+			section.items.forEach(function (movObj){
+				var tx = (sys.orientX),
 				ty = (
-						sys.orY
+						sys.orientY
 						+ deriveScrollParallax(secIndex) / 4
 						* movObj.factor / 10
-					),
+				),
 				tz = 0;
 
-				$(movObj.el).css( 'transform', 'translate3d(' + tx + 'px,' + ty + 'px,' + tz + 'px)' );
+				if (section.vOnly === 'true'){
+					tx = 0;
+					ty = (
+						deriveScrollParallax(secIndex) / 4
+						* movObj.factor / 10
+					);
+				}
+
+				if(section.threed === 'true'){
+					render3D(movObj, tx, ty, tz);
+				}else{
+					render2D(movObj, tx, ty, tz);
+				}
 			});
 		}
 
@@ -183,24 +229,39 @@
 		};
 	});
 
+	//http://davidwalsh.name/javascript-debounce-function
+	core.val('fn.debounce', function (func, wait, immediate) {
+		var timeout;
+		return function() {
+			var context = this, args = arguments;
+			var later = function() {
+				timeout = null;
+				if (!immediate) { func.apply(context, args); }
+			};
+			var callNow = immediate && !timeout;
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (callNow) { func.apply(context, args); }
+		};
+	});
+
 	core.set('mod.parallax', function(){
 		var api = {};
 		var loop = core.get('mod.loop');
 		var sys = core.get('val.sys');
 		var mobileScroll = core.get('mod.mobileScroll');
+		var debounce = core.get('fn.debounce');
 		var deviceOrient = core.get('mod.deviceOrient');
 
 		function getSlideInfo(){
 			sys.sections = [];
 
 			$(sys.slideSectionClass).each(function (){
-				var slideItems = [];
+				var items = [];
 
 				$(this).find('.so').each(function(){
-					slideItems.push({
+					items.push({
 						el: $(this)[0],
-						scroll: $(this).attr('scroll'),
-						mouse: $(this).attr('mouse'),
 						factor: $(this).attr('factor')
 					});
 				});
@@ -209,7 +270,12 @@
 					isSlide: true,
 					height: $(this).height(),
 					offset: $(this).offset().top,
-					items: slideItems
+					items: items,
+
+					//vertical only
+					vOnly: $(this).attr('vOnly'),
+					//threed slide
+					threed: $(this).attr('threed')
 				});
 
 			});
@@ -219,8 +285,8 @@
 
 		//Calculation
 		function deriveScreenCenter(){
-			sys.screenCenterX = (sys.winWidth / 2) - sys.clientX;
-			sys.screenCenterY = (sys.winHeight / 2) - sys.clientY;
+			sys.centerX = (sys.winWidth / 2) - sys.clientX;
+			sys.centerY = (sys.winHeight / 2) - sys.clientY;
 		}
 
 		function deriveCurrentPage(){
@@ -243,6 +309,8 @@
 
 			deriveScreenCenter();
 
+			getSlideInfo();
+
 			loop.start();
 		}
 
@@ -260,12 +328,13 @@
 			loop.start();
 		}
 
-
 		api.init = function(){
-			getSlideInfo();
-			onResize();
+			var debouncedResize = debounce(onResize, 16);
+			// getSlideInfo();
+			debouncedResize();
 
-			window.addEventListener('resize', onResize);
+			window.addEventListener('orientationchange', debouncedResize);
+			window.addEventListener('resize', debouncedResize);
 			window.addEventListener('scroll', onScroll);
 
 			if (!Modernizr.touch){
@@ -316,8 +385,19 @@
 		}
 
 		function init(){
-			document.addEventListener('touchstart', onTouchStart);
-			document.addEventListener('touchmove', onTouchMove);
+
+			//latest ios9 safari has conflict with touchmove scroll sync module.
+
+			var ua = navigator.userAgent.toLowerCase();
+			var isAndroid = ua.indexOf('android') > -1;
+
+			var iOS = /iPad|iPhone|iPod/.test(navigator.platform);
+			var iOSChrome = navigator.userAgent.match('CriOS');
+			if (iOS && iOSChrome && isAndroid){
+				document.addEventListener('touchstart', onTouchStart);
+				document.addEventListener('touchmove', onTouchMove);
+			}
+
 		}
 
 		api.init = init;
@@ -338,25 +418,33 @@
 
 			// Because we don't want to have the device upside down
 			// We constrain the x value to the range [-90,90]
-			if (x > 90) {
-				x = 90;
-			}
-			if (x < -90) {
-				x = -90;
-			}
 
-			sys.orX = y;
-			sys.orY = x - 45; //defailt tilt of hand hold
+			// if (x > 90) {
+			// 	x = 90;
+			// }
+			// if (x < -90) {
+			// 	x = -90;
+			// }
+
+			sys.orientX = y;
+			sys.orientY = x - 35; //defailt tilt of hand hold
 
 			// console.log(y,x);
 			loop.start();
 
 		}
 		function init(){
-			var iOS = /iPad|iPhone|iPod/.test(navigator.platform);
-			if (iOS){
-				window.addEventListener('deviceorientation', handleOrient);
+
+			var ua = navigator.userAgent.toLowerCase();
+			var isAndroid = ua.indexOf('android') > -1;
+
+			if (isAndroid){
+				$('html').addClass('android');
 			}
+
+			window.addEventListener('deviceorientation', handleOrient);
+
+
 		}
 
 		api.init = init;

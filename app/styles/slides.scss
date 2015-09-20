@@ -1,15 +1,8 @@
-body{
-	// background-color: red;
-}
-
 $slideNumber: 4;
-
-
 @mixin slide-background{
 	$slide: "slide";
 	@for $i from 1 through $slideNumber {
 		&.#{$slide}-#{$i} {
-			background-repeat: no-repeat;
 			background-attachment: fixed;
 			background-size: cover;
 			background-color: #5D5656;
@@ -19,14 +12,15 @@ $slideNumber: 4;
 }
 
 
-
-
 .section{
-	display: block;
 	width: 100%;
 	height: 40vh;
+
+	overflow: hidden;
+
 	background-color: papayawhip;
 
+	//make text central
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -64,19 +58,77 @@ $slideNumber: 4;
 	}
 }
 
+.android .slide-section{
+	.so {
+		transition: all 0.3s;
+	}
+	.so3d-1{
+		//anti shaking
+		transition: all 0.3s;
+	}
+}
 
 .slide-section{
 	width: 100vw;
 	height: 80vh;
-
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	// display: flex;
+	// justify-content: center;
+	// align-items: center;
 
 	@include slide-background;
 
 	&.slide-1{
 		height: 70vh;
+		perspective: 3000px;
+		.sog{
+			background: url('../images/obj-bg/26.jpg');
+			background-size: cover;
+
+			transform-style: preserve-3d;
+
+			.so3d-1{
+
+				width: 100%;
+				height: 100%;
+
+				margin:0px;
+
+
+				transform-style: preserve-3d;
+
+				position: relative;
+				.soi{
+					position: absolute;
+					top: 0;
+					left: 0;
+
+					width: 100%;
+					height: 100%;
+
+					display: flex;
+					justify-content: center;
+					align-items: center;
+				}
+				.soi img{
+					max-width: 70vw;
+				}
+				.soi-1{
+					transform: translate3d(0px,0px,100px);
+				}
+				.soi-2{
+					transform: translate3d(0px,0px,150px);
+				}
+				.soi-3{
+					transform: translate3d(0px,0px,200px);
+				}
+				.soi-4{
+					transform: translate3d(0px,0px,250px);
+				}
+
+			}
+		}
+
+
 	}
 
 	&.slide-2{
@@ -101,23 +153,24 @@ $slideNumber: 4;
 	padding: 0px;
 	margin:0px;
 
+	overflow: hidden;
+
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-wrap:wrap;
-	overflow: hidden;
-	.so {
 
+	img.so {
+		//anti shaking
+		// transition: all 0.2s;
 		display: block;
 
 		margin: 30px;
-		// width: 15vh;
-		height: 15vh;
+		max-width: 17vh;
+		max-height: 17vh;
 	}
 
 }
-
-
 
 
 
