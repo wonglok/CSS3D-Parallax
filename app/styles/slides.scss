@@ -5,8 +5,8 @@ $slideNumber: 4;
 		&.#{$slide}-#{$i} {
 			background-attachment: fixed;
 			background-size: cover;
-			background-color: #5D5656;
-			background-image: url('../images/obj-bg/#{$i}.jpg');
+			background-color: papayawhip;
+			// background-image: url('../images/obj-bg/#{$i}.jpg');
 		}
 	}
 }
@@ -27,27 +27,32 @@ $slideNumber: 4;
 
 	&.header{
 		height: 60vh;
-		background: url('../images/obj-bg/14.jpg');
+		background-color: rgba(0.5, 0.5, 0.5, 0.2);
+		//background: url('../images/obj-bg/14.jpg');
 		background-size: cover;
 		color:white;
 	}
 	&.intro-1{
-		background: url('../images/obj-bg/12.jpg');
+		background-color: rgba(0.5, 0.5, 0.5, 0.2);
+		//background: url('../images/obj-bg/12.jpg');
 		background-size: cover;
 		color:white;
 	}
 	&.intro-2{
-		background: url('../images/obj-bg/11.jpg');
+		background-color: rgba(0.5, 0.5, 0.5, 0.2);
+		//background: url('../images/obj-bg/11.jpg');
 		background-size: cover;
 		color:white;
 	}
 	&.intro-3{
-		background: url('../images/obj-bg/23.jpg');
+		background-color: rgba(0.5, 0.5, 0.5, 0.2);
+		//background: url('../images/obj-bg/23.jpg');
 		background-size: cover;
 		color:white;
 	}
 	&.footer{
-		background: url('../images/obj-bg/13.jpg');
+		background-color: rgba(0.5, 0.5, 0.5, 0.2);
+		//background: url('../images/obj-bg/13.jpg');
 		background-size: cover;
 		color:white;
 	}
@@ -81,7 +86,7 @@ $slideNumber: 4;
 		height: 70vh;
 		perspective: 3000px;
 		.sog{
-			background: url('../images/obj-bg/26.jpg');
+			// background: url('../images/obj-bg/26.jpg');
 			background-size: cover;
 
 			transform-style: preserve-3d;
@@ -112,6 +117,14 @@ $slideNumber: 4;
 				.soi img{
 					max-width: 70vw;
 				}
+
+				.soImg{
+				    width: 50vw;
+					max-width: 70vw;
+					height: 50vh;
+					background-color: rgba(0.5, 0.5, 0.5, 0.2);
+				}
+
 				.soi-1{
 					transform: translate3d(0px,0px,100px);
 				}
